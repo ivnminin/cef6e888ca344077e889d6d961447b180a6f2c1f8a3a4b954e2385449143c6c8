@@ -19,5 +19,8 @@
   "homepage": "https://github.com/ivnminin/cef6e888ca344077e889d6d961447b180a6f2c1f8a3a4b954e2385449143c6c8#readme",
   "devDependencies": {
     "hardhat": "^2.9.3"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.5.0"
   }
 }
