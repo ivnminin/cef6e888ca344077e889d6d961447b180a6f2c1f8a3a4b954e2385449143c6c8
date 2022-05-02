@@ -5,4 +5,5 @@ interface IGLDToken {
     function deposit() external payable;
     function transferFrom(address src, address dst, uint amount) external returns (bool);
     function withdraw(uint amount) external;
+    function balanceOf(address account) external returns (uint256);
 }
