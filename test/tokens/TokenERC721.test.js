@@ -8,20 +8,20 @@ describe("Token-ERC721 | GameItem", function () {
     this.deployer = signers[0];
     const tokenFactory = await ethers.getContractFactory("GameItem");
     this.token = await tokenFactory.deploy();
+    this.baseURI = await this.token.baseURI();
   });
   describe("AwardItem", function () {
     beforeEach(async function () {
-      await this.token.awardItem(
-        this.deployer.address,
-        "https://game.example/item-id-8u5h2m.json",
-        {
-          value: amount,
-        }
-      );
+      await this.token.awardItem(this.deployer.address, {
+        value: amount,
+      });
     });
     it("check account received token", async function () {
       expect(await this.token.ownerOf(1)).to.be.equal(this.deployer.address);
       expect(await this.token.balanceOf(this.deployer.address)).to.be.equal(1);
+    });
+    it("check tokenURI", async function () {
+      expect(await this.token.tokenURI(1)).to.be.equal(this.baseURI + 1);
     });
     it("check collection received money", async function () {
       expect(await ethers.provider.getBalance(this.token.address)).to.be.equal(

@@ -5,10 +5,13 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract GameItem is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
+
+    string public baseURI = "https://game.example/api/item/";
 
     address private owner;
 
@@ -21,7 +24,7 @@ contract GameItem is ERC721URIStorage {
         owner = msg.sender;
     }
 
-    function awardItem(address player, string memory tokenURI)
+    function awardItem(address player)
         public
         payable
         onlyOwner
@@ -31,8 +34,12 @@ contract GameItem is ERC721URIStorage {
 
         uint256 newItemId = _tokenIds.current();
         _mint(player, newItemId);
-        _setTokenURI(newItemId, tokenURI);
+        _setTokenURI(newItemId, Strings.toString(newItemId));
 
         return newItemId;
+    }
+
+    function _baseURI() internal view override returns (string memory) {
+        return baseURI;
     }
 }
