@@ -6,27 +6,38 @@ describe("Token-ERC721 | GameItem", function () {
   beforeEach(async function () {
     const signers = await ethers.getSigners();
     this.deployer = signers[0];
-    const tokenFactory = await ethers.getContractFactory("GameItem");
+    const tokenFactory = await ethers.getContractFactory("GLDToken");
     this.token = await tokenFactory.deploy();
-    this.baseURI = await this.token.baseURI();
+    await this.token.deposit({ value: amount });
+    const tokenGameItemFactory = await ethers.getContractFactory("GameItem");
+    this.tokenGameItem = await tokenGameItemFactory.deploy(this.token.address);
+    this.baseURI = await this.tokenGameItem.baseURI();
+    const buyerRole = await this.tokenGameItem.BUYER_ROLE();
+    this.tokenGameItem.grantRole(buyerRole, this.deployer.address);
   });
   describe("AwardItem", function () {
     beforeEach(async function () {
-      await this.token.awardItem(this.deployer.address, {
+      await this.tokenGameItem.awardItem(this.deployer.address, {
         value: amount,
       });
     });
     it("check account received token", async function () {
-      expect(await this.token.ownerOf(1)).to.be.equal(this.deployer.address);
-      expect(await this.token.balanceOf(this.deployer.address)).to.be.equal(1);
+      expect(await this.tokenGameItem.ownerOf(1)).to.be.equal(
+        this.deployer.address
+      );
+      expect(
+        await this.tokenGameItem.balanceOf(this.deployer.address)
+      ).to.be.equal(1);
     });
     it("check tokenURI", async function () {
-      expect(await this.token.tokenURI(1)).to.be.equal(this.baseURI + 1);
+      expect(await this.tokenGameItem.tokenURI(1)).to.be.equal(
+        this.baseURI + 1
+      );
     });
     it("check collection received money", async function () {
-      expect(await ethers.provider.getBalance(this.token.address)).to.be.equal(
-        amount
-      );
+      expect(
+        await ethers.provider.getBalance(this.tokenGameItem.address)
+      ).to.be.equal(amount);
     });
   });
 });
