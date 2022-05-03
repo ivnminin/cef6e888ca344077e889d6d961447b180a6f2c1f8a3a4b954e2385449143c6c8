@@ -29,7 +29,10 @@ contract Market {
     }
 
     function buyTokenGameItem() external payable {
-        tokenGameItem.awardItem{value: msg.value}(msg.sender);
+        uint256 _price = tokenGameItem.getPrice();
+        tokenGLD.transferFrom(msg.sender, address(this), _price);
+        tokenGLD.approve(address(tokenGameItem), _price);
+        tokenGameItem.awardItem(msg.sender);
     }
 
     function buyTokenGameItems(

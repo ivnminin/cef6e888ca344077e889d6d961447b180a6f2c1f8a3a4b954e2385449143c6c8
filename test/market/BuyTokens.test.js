@@ -13,7 +13,10 @@ describe("Market | Buy GameItem | Buy GameItems", function () {
     this.token = await tokenFactory.deploy();
     await this.token.deposit({ value: amount });
     const tokenGameItemFactory = await ethers.getContractFactory("GameItem");
-    this.tokenGameItem = await tokenGameItemFactory.deploy(this.token.address);
+    this.tokenGameItem = await tokenGameItemFactory.deploy(
+      this.token.address,
+      amount.div(2)
+    );
     this.baseURI = await this.tokenGameItem.baseURI();
     const tokenGameItemsFactory = await ethers.getContractFactory(
       "MockGameItems"
@@ -34,6 +37,7 @@ describe("Market | Buy GameItem | Buy GameItems", function () {
       this.tokenGameItem.address,
       this.tokenGameItems.address
     );
+    await this.token.approve(this.tokenMarket.address, amount);
     const buyerRole = await this.tokenGameItem.BUYER_ROLE();
     this.tokenGameItem.grantRole(buyerRole, this.tokenMarket.address);
   });
@@ -56,10 +60,10 @@ describe("Market | Buy GameItem | Buy GameItems", function () {
         this.baseURI + 1
       );
     });
-    it("check collection received money", async function () {
+    it("check collection received GLDToken", async function () {
       expect(
-        await ethers.provider.getBalance(this.tokenGameItem.address)
-      ).to.be.equal(amount);
+        await this.token.balanceOf(this.tokenGameItem.address)
+      ).to.be.equal(amount.div(2));
     });
   });
   describe("Buy GameItems NON_FUNGIBLE token", function () {
