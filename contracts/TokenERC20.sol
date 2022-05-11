@@ -18,7 +18,8 @@ contract GLDToken is ERC20 {
         require(balanceOf(msg.sender) >= amount, "not enough balance");
         _burn(msg.sender, amount);
         address payable receiver = payable(msg.sender);
-        receiver.transfer(amount);
+        (bool sent, ) = receiver.call{value: amount}("");
+        require(sent, "Failed to send Ether");
         emit Withdrawal(receiver, amount);
     }
 }
